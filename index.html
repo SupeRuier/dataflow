@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>多模态数据处理平台架构详解</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,6 +16,8 @@
         window.handleModuleClick = function(moduleId) {
             if (typeof router !== 'undefined') {
                 router.navigate(moduleId);
+                // Close mobile menu if open
+                closeMobileMenu();
             }
         };
 
@@ -29,7 +31,7 @@
                 padding: 20,
                 nodeSpacing: 50,
                 rankSpacing: 50,
-                curve: 'linear' // 保持线性连接，避免遮挡
+                curve: 'linear'
             }
         });
     </script>
@@ -63,14 +65,15 @@
             background: white;
             border-radius: 1rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            padding: 2rem;
+            padding: 1.5rem;
             overflow: auto;
             border: 1px solid #e2e8f0;
             transition: box-shadow 0.3s ease;
-            /* FIX: Centering the diagram */
             display: flex;
             justify-content: center;
             align-items: center;
+            /* Ensure horizontal scroll on mobile if needed */
+            min-height: 300px;
         }
         .mermaid-container:hover {
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
@@ -110,44 +113,64 @@
             font-size: 0.85rem;
             line-height: 1.5;
         }
+
+        /* Mobile Menu Transitions */
+        #mobile-menu {
+            transition: transform 0.3s ease-in-out;
+        }
+        #mobile-menu.hidden-menu {
+            transform: translateX(-100%);
+        }
+        #mobile-menu.visible-menu {
+            transform: translateX(0);
+        }
     </style>
 </head>
-<body class="text-slate-800 h-screen flex flex-col overflow-hidden selection:bg-blue-100">
+<!-- UPDATED: Use dynamic viewport height (dvh) for mobile smoothness -->
+<body class="text-slate-800 h-screen h-[100dvh] flex flex-col overflow-hidden selection:bg-blue-100 bg-slate-50">
 
     <!-- Top Navbar -->
-    <nav class="bg-white border-b border-slate-200 shrink-0 z-50">
+    <nav class="bg-white border-b border-slate-200 shrink-0 z-50 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <div class="flex items-center cursor-pointer group" onclick="router.navigate('home')">
-                    <div class="w-9 h-9 bg-slate-900 rounded-lg flex items-center justify-center text-white mr-3 shadow-md group-hover:scale-105 transition-transform">
-                        <i class="fa-solid fa-layer-group"></i>
-                    </div>
-                    <div class="flex flex-col">
-                        <span class="font-bold text-lg tracking-tight text-slate-900">DataFlow <span class="text-blue-600">Architect</span></span>
-                        <span class="text-[10px] text-slate-400 uppercase tracking-widest font-medium">Enterprise Edition</span>
+                <div class="flex items-center">
+                    <!-- Mobile Menu Button -->
+                    <button onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-md text-slate-500 hover:text-blue-600 hover:bg-slate-100 mr-3 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+
+                    <div class="flex items-center cursor-pointer group" onclick="router.navigate('home')">
+                        <div class="w-9 h-9 bg-slate-900 rounded-lg flex items-center justify-center text-white mr-3 shadow-md group-hover:scale-105 transition-transform">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-bold text-lg tracking-tight text-slate-900">DataFlow <span class="text-blue-600">Architect</span></span>
+                            <span class="text-[10px] text-slate-400 uppercase tracking-widest font-medium">Enterprise Edition</span>
+                        </div>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
                     <button onclick="router.navigate('home')" class="text-slate-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition flex items-center bg-slate-50 hover:bg-slate-100">
-                        <i class="fa-solid fa-house mr-2"></i> 全景概览
+                        <i class="fa-solid fa-house mr-2"></i> <span class="hidden sm:inline">全景概览</span>
                     </button>
                     <div class="hidden md:block h-4 w-px bg-slate-200 mx-1"></div>
-                    <span class="hidden md:block text-slate-400 text-xs font-mono">v3.0.1</span>
+                    <span class="hidden md:block text-slate-400 text-xs font-mono">v3.0.2</span>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- Main Content Area (Split Layout) -->
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-1 overflow-hidden relative">
         
-        <!-- Sidebar Navigation -->
+        <!-- Sidebar Navigation (Desktop) -->
         <aside class="w-64 bg-white border-r border-slate-200 overflow-y-auto hidden lg:block shrink-0 flex flex-col">
             <div class="p-4 flex-1">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 pl-3 flex items-center">
                     <i class="fa-solid fa-sitemap mr-2"></i> 核心模块
                 </h3>
                 <nav class="space-y-1">
+                    <!-- Nav items generated via JS for DRY principle or statically defined -->
                     <a href="#" onclick="router.navigate('module-A')" id="nav-module-A" class="nav-item nav-item-A flex items-center px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition mb-1">
                         <span class="w-2 h-2 rounded-full bg-slate-500 mr-3"></span> 数据源层
                     </a>
@@ -179,18 +202,58 @@
             </div>
         </aside>
 
+        <!-- Mobile Menu Overlay (New Feature) -->
+        <div id="mobile-menu-overlay" onclick="toggleMobileMenu()" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity"></div>
+        <aside id="mobile-menu" class="fixed inset-y-0 left-0 w-64 bg-white shadow-2xl z-50 lg:hidden flex flex-col hidden-menu">
+            <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+                <span class="font-bold text-slate-800">導航菜單</span>
+                <button onclick="toggleMobileMenu()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1">
+                <nav class="space-y-2">
+                    <a href="#" onclick="handleModuleClick('module-A')" class="flex items-center px-3 py-3 rounded-lg bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-700">
+                        <span class="w-3 h-3 rounded-full bg-slate-500 mr-3"></span> 數據源層
+                    </a>
+                    <a href="#" onclick="handleModuleClick('module-B')" class="flex items-center px-3 py-3 rounded-lg bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-700">
+                        <span class="w-3 h-3 rounded-full bg-blue-500 mr-3"></span> 數據預處理層
+                    </a>
+                    <a href="#" onclick="handleModuleClick('module-C')" class="flex items-center px-3 py-3 rounded-lg bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-700">
+                        <span class="w-3 h-3 rounded-full bg-green-500 mr-3"></span> 格式規範層
+                    </a>
+                    <a href="#" onclick="handleModuleClick('module-D')" class="flex items-center px-3 py-3 rounded-lg bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-700">
+                        <span class="w-3 h-3 rounded-full bg-yellow-500 mr-3"></span> 格式校驗引擎
+                    </a>
+                    <a href="#" onclick="handleModuleClick('module-E')" class="flex items-center px-3 py-3 rounded-lg bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-700">
+                        <span class="w-3 h-3 rounded-full bg-red-500 mr-3"></span> 存儲與分層
+                    </a>
+                    <a href="#" onclick="handleModuleClick('module-F')" class="flex items-center px-3 py-3 rounded-lg bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-700">
+                        <span class="w-3 h-3 rounded-full bg-purple-500 mr-3"></span> 可視化系統
+                    </a>
+                    <a href="#" onclick="handleModuleClick('module-G')" class="flex items-center px-3 py-3 rounded-lg bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-700">
+                        <span class="w-3 h-3 rounded-full bg-orange-500 mr-3"></span> 評測數據系統
+                    </a>
+                    <a href="#" onclick="handleModuleClick('module-H')" class="flex items-center px-3 py-3 rounded-lg bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-700">
+                        <span class="w-3 h-3 rounded-full bg-cyan-500 mr-3"></span> 模型訓練對接
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
         <!-- Content Area -->
-        <main class="flex-1 overflow-y-auto bg-slate-50 p-6 lg:p-10 relative scroll-smooth">
+        <!-- UPDATED: Added -webkit-overflow-scrolling: touch behavior via CSS and flex-1 -->
+        <main class="flex-1 overflow-y-auto bg-slate-50 p-4 lg:p-10 relative scroll-smooth overscroll-contain">
             
             <!-- VIEW: HOME (Overview) -->
-            <div id="view-home" class="view-section active max-w-5xl mx-auto">
-                <div class="mb-10 text-center">
-                    <h1 class="text-3xl font-extrabold text-slate-900 mb-3 tracking-tight">架构全景总览</h1>
-                    <p class="text-slate-500">双击或点击下方流程图中的节点，查看详细技术文档与规范。</p>
+            <div id="view-home" class="view-section active max-w-5xl mx-auto pb-20">
+                <div class="mb-8 lg:mb-10 text-center">
+                    <h1 class="text-2xl lg:text-3xl font-extrabold text-slate-900 mb-2 lg:mb-3 tracking-tight">架构全景总览</h1>
+                    <p class="text-sm lg:text-base text-slate-500">双击或点击下方流程图中的节点，查看详细技术文档与规范。</p>
                 </div>
 
                 <!-- Added display:flex and justify-center to parent container -->
-                <div class="mermaid-container mb-12 cursor-pointer flex justify-center">
+                <div class="mermaid-container mb-8 lg:mb-12 cursor-pointer flex justify-center">
                     <div class="mermaid">
                         %%{init: {'theme': 'base', 'themeVariables': { 'fontFamily': 'Noto Sans SC', 'fontSize': '14px' }}}%%
                         flowchart TD
@@ -316,21 +379,21 @@
             </div>
 
             <!-- DYNAMIC DETAIL VIEW CONTAINER -->
-            <div id="view-detail" class="view-section max-w-5xl mx-auto">
+            <div id="view-detail" class="view-section max-w-5xl mx-auto pb-20">
                 <!-- Header -->
-                <div class="flex items-center mb-8">
-                    <button onclick="router.navigate('home')" class="mr-4 w-10 h-10 rounded-full bg-white hover:bg-blue-50 hover:text-blue-600 text-slate-500 border border-slate-200 shadow-sm transition flex items-center justify-center">
+                <div class="flex items-center mb-6 lg:mb-8">
+                    <button onclick="router.navigate('home')" class="mr-4 w-10 h-10 rounded-full bg-white hover:bg-blue-50 hover:text-blue-600 text-slate-500 border border-slate-200 shadow-sm transition flex items-center justify-center flex-shrink-0">
                         <i class="fa-solid fa-arrow-left"></i>
                     </button>
                     <div>
-                        <h2 id="detail-title" class="text-2xl font-bold text-slate-900">Module Title</h2>
-                        <span id="detail-subtitle" class="text-sm text-slate-500 font-medium">Module Subtitle Description</span>
+                        <h2 id="detail-title" class="text-xl lg:text-2xl font-bold text-slate-900 leading-tight">Module Title</h2>
+                        <span id="detail-subtitle" class="text-xs lg:text-sm text-slate-500 font-medium block mt-1">Module Subtitle Description</span>
                     </div>
                 </div>
 
                 <!-- Main Content Card -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden min-h-[500px]">
-                    <div class="p-8 lg:p-10" id="detail-content">
+                    <div class="p-6 lg:p-10" id="detail-content">
                         <!-- Content injected via JS -->
                     </div>
                 </div>
@@ -342,6 +405,33 @@
     <!-- Data & Router Script -->
     <script>
         // Note: window.handleModuleClick is already defined in HEAD script
+
+        // Mobile Menu Logic
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const overlay = document.getElementById('mobile-menu-overlay');
+            
+            if (menu.classList.contains('hidden-menu')) {
+                // Open
+                menu.classList.remove('hidden-menu');
+                menu.classList.add('visible-menu');
+                overlay.classList.remove('hidden');
+            } else {
+                // Close
+                closeMobileMenu();
+            }
+        }
+
+        function closeMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const overlay = document.getElementById('mobile-menu-overlay');
+            
+            menu.classList.remove('visible-menu');
+            menu.classList.add('hidden-menu');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 100);
+        }
 
         // 1. Content Data Store
         const moduleData = {
@@ -392,48 +482,48 @@
                         <!-- Flow Steps -->
                         <div class="relative py-4">
                             <div class="absolute top-1/2 left-0 w-full h-0.5 bg-slate-100 -z-10 transform -translate-y-1/2"></div>
-                            <div class="grid grid-cols-4 gap-4 text-center">
+                            <div class="grid grid-cols-4 gap-2 lg:gap-4 text-center">
                                 <div class="group">
-                                    <div class="w-14 h-14 bg-white border-2 border-slate-200 group-hover:border-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-3 font-bold text-slate-500 shadow-sm z-10 relative transition-colors">1</div>
-                                    <span class="text-sm font-bold text-slate-700 block">轻量清洗</span>
+                                    <div class="w-10 h-10 lg:w-14 lg:h-14 bg-white border-2 border-slate-200 group-hover:border-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-3 font-bold text-slate-500 shadow-sm z-10 relative transition-colors text-xs lg:text-base">1</div>
+                                    <span class="text-xs lg:text-sm font-bold text-slate-700 block">轻量清洗</span>
                                 </div>
                                 <div class="group">
-                                    <div class="w-14 h-14 bg-white border-2 border-slate-200 group-hover:border-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-3 font-bold text-slate-500 shadow-sm z-10 relative transition-colors">2</div>
-                                    <span class="text-sm font-bold text-slate-700 block">深度过滤</span>
+                                    <div class="w-10 h-10 lg:w-14 lg:h-14 bg-white border-2 border-slate-200 group-hover:border-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-3 font-bold text-slate-500 shadow-sm z-10 relative transition-colors text-xs lg:text-base">2</div>
+                                    <span class="text-xs lg:text-sm font-bold text-slate-700 block">深度过滤</span>
                                 </div>
                                 <div class="group">
-                                    <div class="w-14 h-14 bg-blue-50 border-2 border-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-3 font-bold text-blue-600 shadow-md z-10 relative scale-110">3</div>
-                                    <span class="text-sm font-bold text-blue-700 block">AI 辅助标注</span>
+                                    <div class="w-10 h-10 lg:w-14 lg:h-14 bg-blue-50 border-2 border-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-3 font-bold text-blue-600 shadow-md z-10 relative scale-110 text-xs lg:text-base">3</div>
+                                    <span class="text-xs lg:text-sm font-bold text-blue-700 block">AI 辅助标注</span>
                                 </div>
                                 <div class="group">
-                                    <div class="w-14 h-14 bg-white border-2 border-slate-200 group-hover:border-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-3 font-bold text-slate-500 shadow-sm z-10 relative transition-colors">4</div>
-                                    <span class="text-sm font-bold text-slate-700 block">人工复核</span>
+                                    <div class="w-10 h-10 lg:w-14 lg:h-14 bg-white border-2 border-slate-200 group-hover:border-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-3 font-bold text-slate-500 shadow-sm z-10 relative transition-colors text-xs lg:text-base">4</div>
+                                    <span class="text-xs lg:text-sm font-bold text-slate-700 block">人工复核</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
+                        <div class="bg-white border border-slate-200 rounded-xl p-6 lg:p-8 shadow-sm">
                             <h3 class="font-bold text-lg mb-6 text-slate-800 flex items-center">
                                 <i class="fa-solid fa-microchip text-blue-500 mr-2"></i>
                                 AlphaSeed 闭源处理引擎详解
                             </h3>
                             <div class="space-y-4">
                                 <div class="flex items-start p-3 hover:bg-slate-50 rounded-lg transition">
-                                    <div class="mt-1 mr-3 w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">1</div>
+                                    <div class="mt-1 mr-3 w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                                     <div>
                                         <h4 class="font-bold text-sm text-slate-800">敏感信息剔除 (De-identification)</h4>
                                         <p class="text-xs text-slate-500 mt-1">使用正则 + NLP 模型自动识别并掩盖身份证、手机号、邮箱及人脸信息，确保合规。</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start p-3 hover:bg-slate-50 rounded-lg transition">
-                                    <div class="mt-1 mr-3 w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">2</div>
+                                    <div class="mt-1 mr-3 w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
                                     <div>
                                         <h4 class="font-bold text-sm text-slate-800">通用标注 (Auto-Labeling)</h4>
                                         <p class="text-xs text-slate-500 mt-1">利用大模型 (Teacher Model) 对原始图片生成 Caption 或 QA 对。例如，输入一张猫的图片，自动生成 "A fluffy cat sitting on a sofa."</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start p-3 hover:bg-slate-50 rounded-lg transition">
-                                    <div class="mt-1 mr-3 w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">3</div>
+                                    <div class="mt-1 mr-3 w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
                                     <div>
                                         <h4 class="font-bold text-sm text-slate-800">业务精调</h4>
                                         <p class="text-xs text-slate-500 mt-1">针对特定任务（如医疗、法律），加载专用词表进行特异性清洗。</p>
@@ -453,7 +543,7 @@
                             <h3 class="font-bold text-lg mb-3 text-slate-800 flex items-center">
                                 <i class="fa-solid fa-folder-tree text-green-500 mr-2"></i> 1. 物理存储路径规范
                             </h3>
-                            <div class="bg-[#282c34] rounded-lg p-4 shadow-inner overflow-hidden">
+                            <div class="bg-[#282c34] rounded-lg p-4 shadow-inner overflow-hidden overflow-x-auto">
                                 <pre><code class="language-bash">
 /dataset_root
   ├── /multimodal_understanding  # 模态类型 (理解类/生成类)
@@ -470,7 +560,7 @@
                             <h3 class="font-bold text-lg mb-3 text-slate-800 flex items-center">
                                 <i class="fa-solid fa-code text-green-500 mr-2"></i> 2. 逻辑结构规范 (JSON Schema)
                             </h3>
-                            <div class="bg-[#282c34] rounded-lg p-4 shadow-inner overflow-hidden">
+                            <div class="bg-[#282c34] rounded-lg p-4 shadow-inner overflow-hidden overflow-x-auto">
                                 <pre><code class="language-json">
 {
   "$schema": "http://alpha-data.internal/schema/v2.json",
@@ -709,7 +799,7 @@
                         
                         <div class="relative group">
                             <div class="absolute top-0 right-0 bg-slate-700 text-slate-300 text-[10px] px-2 py-1 rounded-bl rounded-tr z-10 font-mono">train_loader.py</div>
-                            <div class="bg-[#282c34] rounded-lg shadow-md overflow-hidden p-4">
+                            <div class="bg-[#282c34] rounded-lg shadow-md overflow-hidden p-4 overflow-x-auto">
                                 <pre><code class="language-python bg-transparent p-0">
 class MultiModalDataset(IterableDataset):
     def __init__(self, data_path, strategy="balanced"):
