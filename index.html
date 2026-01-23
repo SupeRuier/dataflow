@@ -99,6 +99,7 @@
         .nav-item-F.active { background-color: #faf5ff; color: #9333ea; border-left-color: #a855f7; }
         .nav-item-G.active { background-color: #fff7ed; color: #ea580c; border-left-color: #f97316; }
         .nav-item-H.active { background-color: #ecfeff; color: #0891b2; border-left-color: #06b6d4; }
+        .nav-item-I.active { background-color: #f3e8ff; color: #7c3aed; border-left-color: #8b5cf6; }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -195,6 +196,9 @@
                     <a href="#" onclick="router.navigate('module-H')" id="nav-module-H" class="nav-item nav-item-H flex items-center px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition mb-1">
                         <span class="w-2 h-2 rounded-full bg-cyan-500 mr-3"></span> 模型训练对接
                     </a>
+                    <a href="#" onclick="router.navigate('module-I')" id="nav-module-I" class="nav-item nav-item-I flex items-center px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition mb-1">
+                        <span class="w-2 h-2 rounded-full bg-violet-500 mr-3"></span> 训练框架层
+                    </a>
                 </nav>
             </div>
             <div class="p-4 border-t border-slate-100 bg-slate-50/50">
@@ -237,6 +241,9 @@
                     <a href="#" onclick="handleModuleClick('module-H')" class="flex items-center px-3 py-3 rounded-lg bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-700">
                         <span class="w-3 h-3 rounded-full bg-cyan-500 mr-3"></span> 模型訓練對接
                     </a>
+                    <a href="#" onclick="handleModuleClick('module-I')" class="flex items-center px-3 py-3 rounded-lg bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-700">
+                        <span class="w-3 h-3 rounded-full bg-violet-500 mr-3"></span> 訓練框架層
+                    </a>
                 </nav>
             </div>
         </aside>
@@ -267,6 +274,7 @@
                             E --> F
                             E --> G
                             E --> H
+                            H --> I
 
                             %% -----------------------------
                             %% Nodes with Color Matching
@@ -313,6 +321,13 @@
                                 H1[数据加载]
                             end
 
+                            subgraph I["I. 训练框架层"]
+                                style I fill:#f3e8ff,stroke:#8b5cf6,stroke-width:1px,color:#5b21b6,cursor:pointer
+                                I1[PyTorch]
+                                I2[TensorFlow]
+                                I3[自定义框架]
+                            end
+
                             %% -----------------------------
                             %% Interactive Callbacks (FIXED: Added binding for ALL internal nodes)
                             %% -----------------------------
@@ -351,6 +366,12 @@
                             %% Module H
                             click H call handleModuleClick("module-H")
                             click H1 call handleModuleClick("module-H")
+
+                            %% Module I
+                            click I call handleModuleClick("module-I")
+                            click I1 call handleModuleClick("module-I")
+                            click I2 call handleModuleClick("module-I")
+                            click I3 call handleModuleClick("module-I")
 
 
                             %% Link Styling
@@ -796,7 +817,7 @@
                 content: `
                     <div class="space-y-6">
                         <p class="text-sm text-slate-600">该层提供 Python SDK，使算法工程师无需关心底层文件存储细节，直接以 Stream 流形式读取数据。</p>
-                        
+
                         <div class="relative group">
                             <div class="absolute top-0 right-0 bg-slate-700 text-slate-300 text-[10px] px-2 py-1 rounded-bl rounded-tr z-10 font-mono">train_loader.py</div>
                             <div class="bg-[#282c34] rounded-lg shadow-md overflow-hidden p-4 overflow-x-auto">
@@ -805,19 +826,19 @@ class MultiModalDataset(IterableDataset):
     def __init__(self, data_path, strategy="balanced"):
         self.data_shards = list_files(data_path)
         self.strategy = strategy
-    
+
     def __iter__(self):
         worker_info = torch.utils.data.get_worker_info()
         # 自动分配分片给不同的 GPU Worker
         my_shards = distribute_shards(self.data_shards, worker_info)
-        
+
         for shard in my_shards:
             # 增量流式读取，不占用内存
             for sample in read_protobuf_stream(shard):
                 if self.strategy == "balanced":
                     # 实现类型平衡采样逻辑
                     if not self.check_balance(sample): continue
-                
+
                 yield transform(sample)
 
 # 使用示例
@@ -839,6 +860,74 @@ loader = DataLoader(
                                 <span class="block font-bold text-slate-700 mb-1 flex items-center"><i class="fa-solid fa-filter mr-2 text-cyan-600"></i>自定义采样</span>
                                 <span class="text-slate-500 text-xs">按领域权重重采样 (Reweighting)。</span>
                             </div>
+                        </div>
+                    </div>
+                `
+            },
+            "module-I": {
+                title: "I. 训练框架层",
+                subtitle: "多框架支持与训练加速",
+                content: `
+                    <div class="space-y-6">
+                        <p class="text-sm text-slate-600">该层提供对主流深度学习框架的原生支持，并针对多模态数据训练进行了深度优化，提供训练加速、分布式训练和混合精度训练等功能。</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white p-5 border border-slate-200 rounded-xl shadow-sm hover:border-violet-300 transition group">
+                                <div class="w-12 h-12 bg-violet-50 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-brain text-xl text-violet-500"></i>
+                                </div>
+                                <h4 class="font-bold text-slate-800 text-center mb-2">PyTorch 支持</h4>
+                                <p class="text-xs text-slate-500 text-center">完全兼容 PyTorch 生态，提供优化后的 DataLoader 和训练循环。</p>
+                            </div>
+                            <div class="bg-white p-5 border border-slate-200 rounded-xl shadow-sm hover:border-violet-300 transition group">
+                                <div class="w-12 h-12 bg-violet-50 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-chart-line text-xl text-violet-500"></i>
+                                </div>
+                                <h4 class="font-bold text-slate-800 text-center mb-2">TensorFlow 支持</h4>
+                                <p class="text-xs text-slate-500 text-center">支持 TensorFlow/Keras 训练流程，包括 TFRecord 数据格式。</p>
+                            </div>
+                            <div class="bg-white p-5 border border-slate-200 rounded-xl shadow-sm hover:border-violet-300 transition group">
+                                <div class="w-12 h-12 bg-violet-50 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-code-branch text-xl text-violet-500"></i>
+                                </div>
+                                <h4 class="font-bold text-slate-800 text-center mb-2">自定义框架</h4>
+                                <p class="text-xs text-slate-500 text-center">提供通用接口，支持自定义训练框架集成。</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-violet-50 p-5 rounded-lg border-l-4 border-violet-500 flex items-start">
+                            <i class="fa-solid fa-rocket text-violet-500 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="font-bold text-violet-900 text-sm mb-1">训练加速策略</h4>
+                                <p class="text-sm text-violet-800 opacity-90">集成多种训练加速技术，包括自动混合精度训练(AMP)、梯度累积、分布式训练等，显著缩短训练时间。</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#282c34] rounded-lg shadow-md overflow-hidden p-4 overflow-x-auto">
+                            <pre><code class="language-python bg-transparent p-0">
+from training_framework import Trainer, TrainingConfig
+
+# 配置训练参数
+config = TrainingConfig(
+    model_name="clip-vit-base",
+    dataset_path="s3://bucket/v2.0",
+    batch_size=256,
+    epochs=10,
+    mixed_precision=True,
+    distributed=True,
+    num_nodes=8,
+    gpus_per_node=8
+)
+
+# 初始化训练器
+trainer = Trainer(config)
+
+# 开始训练
+trainer.train()
+
+# 保存模型
+trainer.save_model("output/clip-vit-base")
+                            </code></pre>
                         </div>
                     </div>
                 `
