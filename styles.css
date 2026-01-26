@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background-color: #f8fafc;
+}
+
+/* Smooth transitions for view switching */
+.view-section {
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+.view-section.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Enhanced Mermaid Container */
+.mermaid-container {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    padding: 1.5rem;
+    overflow: auto;
+    border: 1px solid #e2e8f0;
+    transition: box-shadow 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
+.mermaid-container:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+}
+
+/* Navigation item styles */
+.nav-item {
+    border-left: 3px solid transparent;
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+.nav-item.active {
+    font-weight: 500;
+}
+/* Custom colors for nav items to match diagram */
+.nav-item-A.active { background-color: #f1f5f9; color: #475569; border-left-color: #64748b; }
+.nav-item-B.active { background-color: #eff6ff; color: #2563eb; border-left-color: #3b82f6; }
+.nav-item-C.active { background-color: #f0fdf4; color: #16a34a; border-left-color: #22c55e; }
+.nav-item-D.active { background-color: #fefce8; color: #ca8a04; border-left-color: #eab308; }
+.nav-item-E.active { background-color: #fef2f2; color: #dc2626; border-left-color: #ef4444; }
+.nav-item-F.active { background-color: #faf5ff; color: #9333ea; border-left-color: #a855f7; }
+.nav-item-G.active { background-color: #fff7ed; color: #ea580c; border-left-color: #f97316; }
+.nav-item-H.active { background-color: #ecfeff; color: #0891b2; border-left-color: #06b6d4; }
+.nav-item-I.active { background-color: #f3e8ff; color: #7c3aed; border-left-color: #8b5cf6; }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* Code Block Styling */
+pre code {
+    border-radius: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+/* Mobile Menu Transitions */
+#mobile-menu {
+    transition: transform 0.3s ease-in-out;
+}
+#mobile-menu.hidden-menu {
+    transform: translateX(-100%);
+}
+#mobile-menu.visible-menu {
+    transform: translateX(0);
+}
