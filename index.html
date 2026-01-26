@@ -562,51 +562,101 @@
                     <div class="space-y-8">
                         <div>
                             <h3 class="font-bold text-lg mb-3 text-slate-800 flex items-center">
-                                <i class="fa-solid fa-folder-tree text-green-500 mr-2"></i> 1. 物理存储路径规范
+                                <i class="fa-solid fa-folder-tree text-green-500 mr-2"></i> 1. 文件规范分层
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="bg-white p-5 border border-slate-200 rounded-xl shadow-sm hover:border-green-300 transition group">
+                                    <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition">
+                                        <i class="fa-solid fa-database text-xl text-green-500"></i>
+                                    </div>
+                                    <h4 class="font-bold text-slate-800 text-center mb-2">原始文件层</h4>
+                                    <p class="text-xs text-slate-500 text-center">存储原始数据文件，保持数据完整性和可追溯性。</p>
+                                </div>
+                                <div class="bg-white p-5 border border-slate-200 rounded-xl shadow-sm hover:border-green-300 transition group">
+                                    <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition">
+                                        <i class="fa-solid fa-file-alt text-xl text-green-500"></i>
+                                    </div>
+                                    <h4 class="font-bold text-slate-800 text-center mb-2">处理文件层</h4>
+                                    <p class="text-xs text-slate-500 text-center">存储经过清洗、标注后的中间数据文件。</p>
+                                </div>
+                                <div class="bg-white p-5 border border-slate-200 rounded-xl shadow-sm hover:border-green-300 transition group">
+                                    <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition">
+                                        <i class="fa-solid fa-check-circle text-xl text-green-500"></i>
+                                    </div>
+                                    <h4 class="font-bold text-slate-800 text-center mb-2">最终文件层</h4>
+                                    <p class="text-xs text-slate-500 text-center">存储符合格式规范、可直接用于训练的最终数据文件。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-lg mb-3 text-slate-800 flex items-center">
+                                <i class="fa-solid fa-info-circle text-green-500 mr-2"></i> 2. 数据集元文件规范
                             </h3>
                             <div class="bg-[#282c34] rounded-lg p-4 shadow-inner overflow-hidden overflow-x-auto">
-                                <pre><code class="language-bash">
-/dataset_root
-  ├── /multimodal_understanding  # 模态类型 (理解类/生成类)
-  │    ├── /image_text_pairs     # 数据来源或细分类型
-  │    │    ├── /v1.0.0          # 版本号 (语义化版本控制)
-  │    │    │    ├── data.001.bin
-  │    │    │    ├── data.002.bin
-  │    │    │    └── metadata.json
+                                <pre><code class="language-json">
+{
+  "dataset_id": "mmu_image_text_v1.0.0",
+  "version": "1.0.0",
+  "name": "多模态理解图文数据集",
+  "description": "包含10万对图文数据，用于训练视觉-语言理解模型",
+  "creation_date": "2024-01-26",
+  "modalities": ["image", "text"],
+  "stats": {
+    "total_samples": 100000,
+    "image_resolution": {
+      "min": [256, 256],
+      "max": [1024, 1024],
+      "mean": [512, 512]
+    },
+    "text_length": {
+      "min": 10,
+      "max": 200,
+      "mean": 85
+    }
+  },
+  "data_sources": ["huggingface", "internal"],
+  "tags": ["multimodal", "vision-language", "clip"],
+  "license": "internal"
+}
                                 </code></pre>
                             </div>
                         </div>
 
                         <div>
                             <h3 class="font-bold text-lg mb-3 text-slate-800 flex items-center">
-                                <i class="fa-solid fa-code text-green-500 mr-2"></i> 2. 逻辑结构规范 (JSON Schema)
+                                <i class="fa-solid fa-code text-green-500 mr-2"></i> 3. 数据样本规范
                             </h3>
                             <div class="bg-[#282c34] rounded-lg p-4 shadow-inner overflow-hidden overflow-x-auto">
                                 <pre><code class="language-json">
 {
-  "$schema": "http://alpha-data.internal/schema/v2.json",
-  "type": "object",
-  "properties": {
-    "sample_id": { "type": "string", "pattern": "^uuid-[a-f0-9]{32}$" },
-    "media": {
-      "type": "object",
-      "properties": {
-        "image_path": { "type": "string" },
-        "resolution": { "type": "array", "items": { "type": "integer" } }
-      }
-    },
-    "annotations": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "text": { "type": "string" },
-          "language": { "enum": ["en", "zh", "fr"] }
-        }
-      }
-    }
+  "sample_id": "uuid-1234567890abcdef1234567890abcdef",
+  "media": {
+    "image_path": "/dataset_root/multimodal_understanding/image_text_pairs/v1.0.0/images/001.jpg",
+    "resolution": [512, 512],
+    "format": "jpeg"
   },
-  "required": ["sample_id", "media", "annotations"]
+  "annotations": [
+    {
+      "text": "一只可爱的小猫坐在沙发上",
+      "language": "zh",
+      "source": "human",
+      "confidence": 0.98
+    },
+    {
+      "text": "A cute cat sitting on a sofa",
+      "language": "en",
+      "source": "machine",
+      "confidence": 0.95
+    }
+  ],
+  "metadata": {
+    "data_source": "internal",
+    "collection_date": "2024-01-01",
+    "region": "cn",
+    "category": "animals"
+  },
+  "quality_score": 0.92
 }
                                 </code></pre>
                             </div>
