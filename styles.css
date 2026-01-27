@@ -1,8 +1,40 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
 
+/* CSS Variables for Light/Dark Theme */
+:root {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-tertiary: #94a3b8;
+    --border-color: #e2e8f0;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+    --shadow-hover: rgba(0, 0, 0, 0.08);
+    --sidebar-bg: #ffffff;
+    --nav-item-hover: #f1f5f9;
+}
+
 body {
     font-family: 'Noto Sans SC', sans-serif;
-    background-color: #f8fafc;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark Mode Styles */
+body.dark {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --border-color: #334155;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --shadow-hover: rgba(0, 0, 0, 0.4);
+    --sidebar-bg: #1e293b;
+    --nav-item-hover: #334155;
 }
 
 /* Smooth transitions for view switching */
@@ -20,26 +52,30 @@ body {
 
 /* Enhanced Mermaid Container */
 .mermaid-container {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
     padding: 1.5rem;
     overflow: auto;
-    border: 1px solid #e2e8f0;
-    transition: box-shadow 0.3s ease;
+    border: 1px solid var(--border-color);
+    transition: box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 300px;
 }
 .mermaid-container:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 10px 15px -3px var(--shadow-hover), 0 4px 6px -2px var(--shadow-hover);
 }
 
 /* Navigation item styles */
 .nav-item {
     border-left: 3px solid transparent;
     border-radius: 0 0.5rem 0.5rem 0;
+    color: var(--text-secondary);
+}
+.nav-item:hover {
+    background-color: var(--nav-item-hover);
 }
 .nav-item.active {
     font-weight: 500;
@@ -58,8 +94,8 @@ body {
 /* Custom Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar-thumb { background: var(--text-tertiary); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
 /* Code Block Styling */
 pre code {
@@ -72,10 +108,69 @@ pre code {
 /* Mobile Menu Transitions */
 #mobile-menu {
     transition: transform 0.3s ease-in-out;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
 }
 #mobile-menu.hidden-menu {
     transform: translateX(-100%);
 }
 #mobile-menu.visible-menu {
     transform: translateX(0);
+}
+
+/* Dark Mode Specific Styles */
+body.dark .mermaid g g:nth-child(1) rect {
+    fill: #1e293b !important;
+    stroke: #334155 !important;
+}
+body.dark .mermaid g g:nth-child(1) text {
+    fill: #f1f5f9 !important;
+}
+body.dark .mermaid g g g rect {
+    fill: #334155 !important;
+}
+body.dark .mermaid g g g text {
+    fill: #cbd5e1 !important;
+}
+
+/* Navbar Styles for Dark Mode */
+body.dark nav {
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+body.dark .nav-item {
+    color: var(--text-secondary);
+}
+body.dark .nav-item:hover {
+    background-color: var(--nav-item-hover);
+}
+
+/* Sidebar Styles for Dark Mode */
+body.dark aside {
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+}
+body.dark aside h3 {
+    color: var(--text-tertiary);
+}
+
+/* Content Styles for Dark Mode */
+body.dark main {
+    background-color: var(--bg-primary);
+}
+body.dark #view-detail {
+    background-color: var(--bg-primary);
+}
+body.dark #view-detail .bg-white {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+body.dark #view-detail .text-slate-800 {
+    color: var(--text-primary);
+}
+body.dark #view-detail .text-slate-600 {
+    color: var(--text-secondary);
+}
+body.dark #view-detail .text-slate-500 {
+    color: var(--text-tertiary);
 }

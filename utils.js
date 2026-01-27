@@ -1,3 +1,58 @@
+// Dark Mode Logic
+function toggleDarkMode() {
+    const body = document.body;
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const icon = darkModeToggle.querySelector('i');
+    const text = darkModeToggle.querySelector('span');
+
+    body.classList.toggle('dark');
+    const isDark = body.classList.contains('dark');
+
+    // Update button icon and text
+    if (isDark) {
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+        text.textContent = '白天模式';
+        localStorage.setItem('darkMode', 'true');
+    } else {
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+        text.textContent = '黑夜模式';
+        localStorage.setItem('darkMode', 'false');
+    }
+
+    // Re-render Mermaid diagram for dark mode
+    if (typeof mermaid !== 'undefined') {
+        mermaid.init();
+    }
+}
+
+// Check for saved dark mode preference or system preference
+document.addEventListener('DOMContentLoaded', function() {
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const icon = darkModeToggle.querySelector('i');
+    const text = darkModeToggle.querySelector('span');
+
+    // Check if user has previously set dark mode
+    const savedDarkMode = localStorage.getItem('darkMode');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedDarkMode === 'true' || (!savedDarkMode && prefersDark)) {
+        document.body.classList.add('dark');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+        text.textContent = '白天模式';
+    } else {
+        document.body.classList.remove('dark');
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+        text.textContent = '黑夜模式';
+    }
+
+    // Initialize Highlight.js
+    hljs.highlightAll();
+});
+
 // Mobile Menu Logic
 function toggleMobileMenu() {
     const menu = document.getElementById('mobile-menu');
