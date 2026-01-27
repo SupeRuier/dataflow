@@ -312,7 +312,7 @@ const moduleData = {
                 `
     },
     "module-F": {
-        title: "F. ANGEL (Analytics Generation Layer)",
+        title: "F. 数据分析层 (ANGEL)",
         subtitle: "数据分析生成层：通过图表洞察数据分布",
         content: `
                     <div class="space-y-6">
@@ -358,7 +358,7 @@ const moduleData = {
                 `
     },
     "module-G": {
-        title: "G. DEVIL (Di-eval)",
+        title: "G. 评测系统 (DEVIL)",
         subtitle: "双维度评测系统：Benchmark与评估报告",
         content: `
                     <div class="space-y-6">
